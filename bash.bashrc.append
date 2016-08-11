@@ -1,0 +1,8 @@
+if [[ -n "$SSH_CLIENT" ]]; then
+        re='^(([0-9]+)(\.)*){3}'
+        if [[ $SSH_CLIENT =~ $re ]]; then
+                if [ ${BASH_REMATCH[0]} != '192.168.144.' ]; then
+                        /usr/bin/pushb "$LOGNAME just logged in from $SSH_CLIENT" >/dev/null 2>&1 </dev/null& disown;
+                fi
+        fi
+fi
