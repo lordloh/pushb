@@ -1,0 +1,66 @@
+#! /usr/bin/python3
+
+import sys
+from pushbullet import PushBullet
+import os.path
+import json
+from io import StringIO
+import socket
+#import fileinput
+
+def main(argv):
+	if passedArg(argv,'--apikey'):
+		newKey()
+		return
+	if (os.path.isfile(os.path.expanduser('~/.pushbullet.apikey')) ):
+		fobj=open(os.path.expanduser('~/.pushbullet.apikey'),'r')
+		key=fobj.read()
+		fobj.close()
+	elif (os.path.isfile('/etc/pushbullet.apikey')):
+		fobj=open('/etc/pushbullet.apikey','r')
+		key=fobj.read()
+		fobj.close()				
+	else:
+		act=input('~/.pushbullet.apikey not found. Would you like to create one now? (Yes / No)')
+		if act.lower()=='y' or act.lower()=='yes':
+			newKey()
+			return;
+		else:
+			print ('Bye.')
+	if len(argv)>1:
+		key=key.strip()
+		pb=PushBullet(key)
+		pb.push_note(socket.gethostname(),argv[1])
+	else:
+		print('No message to push.')
+	
+
+def newKey():
+	apikey=input('Please enter the API key :')
+	if isValidKey(apikey):
+		fobj=open(os.path.expanduser('~/.pushbullet.apikey'),'w')
+		fobj.write(apikey);
+		fobj.close();
+		print('valid key.')
+	else:
+		print('The API key is not valid. Bye.')
+	#success, push = pb.push_note("This is the title", "This is the body")
+
+def isValidKey(k):
+	pb = PushBullet(k)
+	push = pb.push_note("TEST PUSH", "This push is meant to validate your API key.")
+	success=True
+	if (success == True):
+		return True
+	else:
+		print (push["error"]["message"])
+		return False
+
+def passedArg(args,lookFor):
+	if lookFor in args:
+		return True
+	else:
+		return False
+
+if __name__=="__main__":
+	main(sys.argv)
