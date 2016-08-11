@@ -1,0 +1,1 @@
+@reboot pushb "The system just rebooted."&
